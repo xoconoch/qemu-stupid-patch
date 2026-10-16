@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patched QEMU Debian Repository (ARM64)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #24292e; background: #fafbfc; }
+    h1 { border-bottom: 1px solid #e1e4e8; padding-bottom: 10px; }
+    pre { background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; overflow-x: auto; font-size: 14px; }
+    code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+    .badge { display: inline-block; background: #0366d6; color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Patched QEMU Debian Repository <span class="badge">ARM64</span></h1>
+  <p>This repository provides patched static <code>qemu-user</code> builds for 64-bit ARM hosts with the default <code>guest_base = 0x800000000000</code> fix, resolving Rust/jemalloc/mimalloc segfaults in emulated x86_64 environments.</p>
+
+  <h2>Installation on Debian / Ubuntu (ARM64)</h2>
+  <pre><code># 1. Download and install repository GPG key
+sudo curl -fsSL ./KEY.gpg -o /etc/apt/keyrings/qemu-patch.gpg
+
+# 2. Add repository source
+echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/qemu-patch.gpg] $(pwd -P | sed "s|.*||") ./ stable main" | sudo tee /etc/apt/sources.list.d/qemu-patch.list
+
+# (Or if hosted on GitHub Pages):
+# echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/qemu-patch.gpg] https://&lt;username&gt;.github.io/&lt;repo&gt; stable main" | sudo tee /etc/apt/sources.list.d/qemu-patch.list
+
+# 3. Update package index and install / upgrade
+sudo apt update
+sudo apt install qemu-user-static</code></pre>
+</body>
+</html>

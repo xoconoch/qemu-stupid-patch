@@ -1,0 +1,27 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: qemu-patch
+Label: qemu-patch
+Suite: stable
+Codename: stable
+Date: Fri, 16 Oct 2026 19:50:44 UTC
+Architectures: arm64
+Components: main
+Description: Patched QEMU user emulation packages with 47-bit VA fix for ARM64
+MD5Sum:
+ f056f84734cf2dd96113f650afdb464d 659 main/binary-arm64/Packages
+ 1f260528a053f806046d2a3ab9de1568 423 main/binary-arm64/Packages.gz
+SHA1:
+ a74510303cbb3d4a6afd8b3b1c1e61428ee51fe6 659 main/binary-arm64/Packages
+ fe7c547edc3bbfd3396c650423e077a22b440d12 423 main/binary-arm64/Packages.gz
+SHA256:
+ a15bf726f2bc44fe68048f946744ca83b6eac5c1e00c1b349984c2fca70abed8 659 main/binary-arm64/Packages
+ 191aad8152bfa4e1e844607069ea95475c516443058498d3934dfe8e9f553444 423 main/binary-arm64/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQQBiOMC3xp7RG/TKcMje9QVePTDygUCatKAFAAKCRAje9QVePTD
+yhL4AP9HC2J7FMedFxbWUemcxbj2Oeg+RtKgfzUoEjEM66fUJAEA/sAdbhCoLEQe
+ZOEpplpimAJqUqW/GoQeBaKGCL2/mwE=
+=8Gzu
+-----END PGP SIGNATURE-----

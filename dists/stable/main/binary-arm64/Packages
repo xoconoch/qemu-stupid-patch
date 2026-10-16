@@ -1,0 +1,16 @@
+Package: qemu-user-static
+Version: 2:11.1.2-1+guestbase
+Architecture: arm64
+Maintainer: Custom Build <local@localhost>
+Conflicts: qemu-user, qemu-user-binfmt
+Replaces: qemu-user, qemu-user-binfmt
+Provides: qemu-user, qemu-user-binfmt, qemu-user-x86-64-patched
+Filename: pool/main/qemu-user-static_11.1.2-1+guestbase_arm64.deb
+Size: 5178756
+MD5sum: ef3b322de9547fb22b15dbedd77f1ba1
+SHA1: 54d889496ba0eeb6a75a465d42ed4879320fb2c4
+SHA256: 96ee949e5ad68ae53db47d5670b8cb03d26c723fc07672f57691a208e9fc5793
+Section: otherosfs
+Priority: optional
+Description: Patched static QEMU x86_64 emulator with 0x800000000000 guest_base default and systemd-binfmt integration
+
