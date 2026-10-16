@@ -1,0 +1,4 @@
+build-workspace/
+pkg-root/
+*.deb
+qemu/

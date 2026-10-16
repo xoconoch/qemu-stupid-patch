@@ -1,0 +1,162 @@
+name: Build Patched QEMU Deb & Update APT Repo
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  schedule:
+    # Run daily at 02:00 UTC to automatically detect & build new upstream releases
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      qemu_version:
+        description: "QEMU git tag / branch to build (leave empty to auto-detect latest upstream release)"
+        required: false
+        default: ""
+      force_build:
+        description: "Force build even if version already exists in repo"
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    name: Build & Publish APT Repository (ARM64)
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: repo
+        continue-on-error: true
+
+      - name: Resolve Target QEMU Version
+        id: resolve-version
+        run: |
+          TARGET_VERSION="${{ github.event.inputs.qemu_version }}"
+
+          if [ -z "$TARGET_VERSION" ]; then
+            echo "No explicit version specified. Checking latest upstream stable QEMU release..."
+            
+            # Try GitLab API first
+            TARGET_VERSION=$(curl -sf "https://gitlab.com/api/v4/projects/qemu-project%2Fqemu/repository/tags?order_by=updated&sort=desc" | python3 -c '
+          import sys, json, re
+          try:
+              tags = json.load(sys.stdin)
+              valid = [t["name"] for t in tags if re.match(r"^v\d+\.\d+\.\d+$", t.get("name", ""))]
+              if valid:
+                  print(valid[0])
+          except Exception:
+              pass
+          ' || true)
+
+            # Fallback to GitHub API mirror if GitLab was empty
+            if [ -z "$TARGET_VERSION" ]; then
+              TARGET_VERSION=$(curl -sf "https://api.github.com/repos/qemu/qemu/tags?per_page=50" | python3 -c '
+          import sys, json, re
+          try:
+              tags = json.load(sys.stdin)
+              valid = [t["name"] for t in tags if re.match(r"^v\d+\.\d+\.\d+$", t.get("name", ""))]
+              if valid:
+                  print(valid[0])
+          except Exception:
+              pass
+          ' || true)
+            fi
+
+            TARGET_VERSION="${TARGET_VERSION:-v10.0.4}"
+          fi
+
+          echo "Target QEMU version resolved to: ${TARGET_VERSION}"
+          echo "qemu_version=${TARGET_VERSION}" >> "$GITHUB_OUTPUT"
+
+          # Check if this version has already been built into repo
+          CLEAN_VER="${TARGET_VERSION#v}"
+          FORCE="${{ github.event.inputs.force_build || 'false' }}"
+          IS_SCHEDULE="${{ github.event_name == 'schedule' }}"
+          ALREADY_BUILT="false"
+
+          if [ -f "repo/dists/stable/main/binary-arm64/Packages" ]; then
+            if grep -q "Version: 2:${CLEAN_VER}" "repo/dists/stable/main/binary-arm64/Packages"; then
+              ALREADY_BUILT="true"
+            fi
+          fi
+
+          if [ "$ALREADY_BUILT" = "true" ] && [ "$FORCE" != "true" ] && [ "$IS_SCHEDULE" = "true" ]; then
+            echo "Version ${TARGET_VERSION} is already published in APT repo. Skipping scheduled build."
+            echo "skip_build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip_build=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install build and packaging dependencies
+        if: steps.resolve-version.outputs.skip_build != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            git build-essential python3 ninja-build pkg-config \
+            libglib2.0-dev libpixman-1-dev dpkg-dev gnupg
+
+      - name: Compile and assemble Debian package
+        if: steps.resolve-version.outputs.skip_build != 'true'
+        env:
+          QEMU_VERSION: ${{ steps.resolve-version.outputs.qemu_version }}
+          INSTALL_DEPS: "0"
+        run: |
+          ./build-deb.sh
+
+      - name: Configure GPG signing key
+        if: steps.resolve-version.outputs.skip_build != 'true' && github.event_name != 'pull_request'
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          if [ -n "${GPG_PRIVATE_KEY:-}" ]; then
+            echo "Importing repository GPG private key..."
+            echo "$GPG_PRIVATE_KEY" | base64 -d 2>/dev/null | gpg --batch --import || \
+            echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          else
+            echo "Note: GPG_PRIVATE_KEY secret is not set. Repo will be published unsigned until key is configured."
+          fi
+
+      - name: Update APT repository structure
+        if: steps.resolve-version.outputs.skip_build != 'true' && github.event_name != 'pull_request'
+        run: |
+          ./scripts/update-repo.sh --repo-dir repo --deb "${OUTPUT_DEB}"
+
+      - name: Deploy APT repository to gh-pages branch
+        if: steps.resolve-version.outputs.skip_build != 'true' && github.event_name != 'pull_request'
+        run: |
+          cd repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ ! -d ".git" ]; then
+            git init -b gh-pages
+            git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          fi
+
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No repository changes to commit."
+          else
+            git commit -m "Update APT repository with QEMU ${{ steps.resolve-version.outputs.qemu_version }}"
+            git push origin gh-pages
+          fi
+
+      - name: Upload Debian package artifact
+        if: steps.resolve-version.outputs.skip_build != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qemu-packages
+          path: "*.deb"
+          if-no-files-found: warn

@@ -1,0 +1,39 @@
+From: Antigravity <local@localhost>
+Date: Fri, 16 Oct 2026 00:00:00 +0000
+Subject: [PATCH] linux-user: default guest_base to 0x800000000000 for x86_64
+
+On 64-bit hosts with virtual address spaces larger than 47 bits (such as
+ARM64 with CONFIG_ARM64_VA_BITS=48), guest x86_64 allocations via host mmap
+frequently return addresses >= 2^47 (bit 47 = 1).
+
+x86_64 user-space allocators and runtimes (including jemalloc in rustc/uv
+and mimalloc in Nix) assume mmap() without a high hint returns addresses
+below 2^47, sign-extending or tagging pointers based on bit 47. When bit 47
+is set, sign-extension creates non-canonical addresses, resulting in SIGSEGV.
+
+Defaulting guest_base to 0x800000000000 when unspecified maps the guest
+address space cleanly into the host's upper 48-bit space and restricts guest
+VMAs allocated by mmap_find_vma to < 2^47.
+---
+ linux-user/main.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 1234567..89abcdef 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -957,6 +957,13 @@ int main(int argc, char **argv, char **envp)
+ 
+     optind = parse_args(argc, argv);
+ 
++#if defined(TARGET_X86_64)
++    if (!have_guest_base && !reserved_va) {
++        guest_base = 0x800000000000ULL;
++        have_guest_base = true;
++    }
++#endif
++
+     target_environ = envlist_to_environ(envlist, NULL);
+     envlist_free(envlist);
+-- 
+2.43.0
