@@ -18,16 +18,14 @@
 
   <h2>Installation on Debian / Ubuntu (ARM64)</h2>
   <pre><code># 1. Download and install repository GPG key
-sudo curl -fsSL ./KEY.gpg -o /etc/apt/keyrings/qemu-patch.gpg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://xoconoch.github.io/qemu-stupid-patch/KEY.gpg | sudo tee /etc/apt/keyrings/qemu-stupid-patch.gpg > /dev/null
 
 # 2. Add repository source
-echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/qemu-patch.gpg] $(pwd -P | sed "s|.*||") ./ stable main" | sudo tee /etc/apt/sources.list.d/qemu-patch.list
-
-# (Or if hosted on GitHub Pages):
-# echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/qemu-patch.gpg] https://&lt;username&gt;.github.io/&lt;repo&gt; stable main" | sudo tee /etc/apt/sources.list.d/qemu-patch.list
+echo "deb [arch=arm64 signed-by=/etc/apt/keyrings/qemu-stupid-patch.gpg] https://xoconoch.github.io/qemu-stupid-patch stable main" | sudo tee /etc/apt/sources.list.d/qemu-stupid-patch.list
 
 # 3. Update package index and install / upgrade
 sudo apt update
-sudo apt install qemu-user-static</code></pre>
+sudo apt install -y qemu-user-static</code></pre>
 </body>
 </html>
