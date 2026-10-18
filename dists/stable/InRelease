@@ -5,23 +5,23 @@ Origin: qemu-patch
 Label: qemu-patch
 Suite: stable
 Codename: stable
-Date: Fri, 16 Oct 2026 19:53:52 UTC
+Date: Sun, 18 Oct 2026 00:23:22 UTC
 Architectures: arm64
 Components: main
 Description: Patched QEMU user emulation packages with 47-bit VA fix for ARM64
 MD5Sum:
- b84dd700bea37d5cbae1d3647eede997 659 main/binary-arm64/Packages
- e259b72bd813ce4f4d6d5707bf8d232c 423 main/binary-arm64/Packages.gz
+ 1e2c54df2580154b7b1d951ec33f92ea 659 main/binary-arm64/Packages
+ 9a4855f1fbdd86fc1451e558717e88eb 423 main/binary-arm64/Packages.gz
 SHA1:
- b68394be5d1beebe9e635b83bd7de3702b13cdb0 659 main/binary-arm64/Packages
- 9ca44e70b9f03ff0ecd85d642b47e6fc09028491 423 main/binary-arm64/Packages.gz
+ 1d8ffb63e221c6e8c48e3dd3418b008089104412 659 main/binary-arm64/Packages
+ f3ee17a47cfaf34fa6310bd55fe6b13f9c3444f3 423 main/binary-arm64/Packages.gz
 SHA256:
- d9f969bbdb403132dd3b759bdfd6f8e442101b77ac46106e2bf84b4247795a21 659 main/binary-arm64/Packages
- 1cb1e21553c3c2c23b2208ece1cc195013a3f8cf08772b761a772dc8c8166cf1 423 main/binary-arm64/Packages.gz
+ 7700437ae4e71daec541360d53dc84db99242592ea446d51f859327a6d6dc230 659 main/binary-arm64/Packages
+ 53b31c44deeb25d4e7a9b79c472d44d4433505cb6867d6792deffbf1c0849eee 423 main/binary-arm64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYKAB0WIQQBiOMC3xp7RG/TKcMje9QVePTDygUCatKA0AAKCRAje9QVePTD
-yj6ZAQC+Vg8RCFddISLx3y0bc3EOJAlt4DgAR5Sxgh2eyBOVywEApkiLC88P8gty
-ya/GT7EajHY94DeadFfDZMp//9F3IwM=
-=e0jp
+iHUEARYKAB0WIQQBiOMC3xp7RG/TKcMje9QVePTDygUCatQRegAKCRAje9QVePTD
+ymoGAQDxIQDoizYOiphvVhbkFce1daC8zY6Ng0aRSKlS4u1c7gEA6qmeDL22ytB4
+B6fRASg3lAMLQHG44zD2z2V0H6O70Qc=
+=KLue
 -----END PGP SIGNATURE-----

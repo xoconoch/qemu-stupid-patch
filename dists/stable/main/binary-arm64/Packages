@@ -6,10 +6,10 @@ Conflicts: qemu-user, qemu-user-binfmt
 Replaces: qemu-user, qemu-user-binfmt
 Provides: qemu-user, qemu-user-binfmt, qemu-user-x86-64-patched
 Filename: pool/main/qemu-user-static_11.1.2-1+guestbase_arm64.deb
-Size: 5179642
-MD5sum: 6513e943965d01f4715f9aa216a9be5c
-SHA1: a3d33ea009e940d8f013126794e2970f7644e542
-SHA256: 3dfe94dac6ef44613f7338e622f866211bd8df006bc76e159b419b5a53ccf2c6
+Size: 5178962
+MD5sum: c0f4ffd2b5ab5eff4f4364d9bf9a5eb8
+SHA1: cba05688c5b78620c7ab347c3d533e0468596cf3
+SHA256: 443f5fd5d78db6a9f5d6d4e8b3317df50adc0bce22ad7383a17de68d5ff02c92
 Section: otherosfs
 Priority: optional
 Description: Patched static QEMU x86_64 emulator with 0x800000000000 guest_base default and systemd-binfmt integration
